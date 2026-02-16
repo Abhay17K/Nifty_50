@@ -18,12 +18,16 @@ def calculate_hourly_indicators(df):
     df['rsi_zone'] = np.where(df['rsi_14'] > 70, 'Overbought', 
                              np.where(df['rsi_14'] < 30, 'Oversold', 'Neutral'))
 
-    # ROC
+    # ROC Suite
     df['roc_7'] = ta.roc(df['close'], length=7)
     df['roc_9'] = ta.roc(df['close'], length=9)
     df['roc_21'] = ta.roc(df['close'], length=21)
-    df['roc_7_pos'] = (df['roc_7'] > 0).astype(int)
-    df['roc_diff_7_21'] = df['roc_7'] - df['roc_21']
+    df['roc7_flag'] = (df['roc_7'] > 0).astype(int)
+    df['roc_accel'] = df['roc_7'] - df['roc_21']
+
+    # Range Metrics
+    df['hl_range'] = df['high'] - df['low']
+    df['range_pct'] = (df['hl_range'] / df['close']) * 100
 
     # Moving Averages
     df['ema_7'] = ta.ema(df['close'], length=7)
@@ -71,32 +75,9 @@ def calculate_hourly_indicators(df):
     df['atr_14'] = ta.atr(df['high'], df['low'], df['close'], length=14)
     df['atr_pct'] = df['atr_14'] / df['close'] * 100
 
-    # VWAP (Approximation for hourly data: volume-weighted price)
-    # Note: True VWAP resets daily. pandas-ta doesn't always handle reset easily without groupbys
-    # We'll use a cumulative VWAP grouped by date for accuracy
-    df_reset = df.reset_index()
-    df_reset['date'] = df_reset['timestamp'].dt.date
-    vwap_vals = []
-    for date, group in df_reset.groupby('date'):
-        group = group.copy()
-        group['cum_pv'] = (group['close'] * group['volume']).cumsum()
-        group['cum_v'] = group['volume'].cumsum()
-        group['vwap_day'] = group['cum_pv'] / group['cum_v']
-        # If volume is 0 (yfinance sometimes has 0 volume for indices), use average price
-        group.loc[group['cum_v'] == 0, 'vwap_day'] = group['close']
-        vwap_vals.append(group[['timestamp', 'vwap_day']])
-    
-    vwap_df = pd.concat(vwap_vals).set_index('timestamp')
-    df['vwap'] = vwap_df['vwap_day']
-    df['close_pct_vwap'] = (df['close'] - df['vwap']) / df['vwap'] * 100
-
     # Breakouts
     df['break_high_5'] = (df['close'] > df['high'].shift(1).rolling(5).max()).astype(int)
     df['break_low_5'] = (df['close'] < df['low'].shift(1).rolling(5).min()).astype(int)
-
-    # Volume
-    df['vol_avg_20'] = ta.sma(df['volume'], length=20)
-    df['vol_rel_avg'] = df['volume'] / df['vol_avg_20']
 
     return df
 

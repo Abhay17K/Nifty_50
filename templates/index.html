@@ -38,8 +38,16 @@
                             <label><input type="checkbox" data-col="rsi_sma_14"> SMA(RSI)</label>
                             <label><input type="checkbox" data-col="rsi_diff"> RSI - SMA</label>
                             <label><input type="checkbox" data-col="rsi_slope"> RSI Slope</label>
-                            <label><input type="checkbox" data-col="rsi_dist_50"> RSI from 50</label>
-                            <label><input type="checkbox" data-col="rsi_zone"> RSI Zone</label>
+                        </div>
+                    </div>
+                    <div class="indicator-group" id="group-roc" data-timeframe="1h">
+                        <label>ROC Suite (1H)</label>
+                        <div class="checkbox-list">
+                            <label><input type="checkbox" data-col="roc_7"> ROC(7)</label>
+                            <label><input type="checkbox" data-col="roc_9"> ROC(9)</label>
+                            <label><input type="checkbox" data-col="roc_21"> ROC(21)</label>
+                            <label><input type="checkbox" data-col="roc7_flag"> ROC7 > 0</label>
+                            <label><input type="checkbox" data-col="roc_accel"> ROC Accel</label>
                         </div>
                     </div>
                     <div class="indicator-group" id="group-ma" data-timeframe="1h">
@@ -59,19 +67,24 @@
                         </div>
                     </div>
                     <div class="indicator-group" id="group-vol" data-timeframe="1h">
-                        <label>Volatility & VWAP (1H)</label>
+                        <label>Volatility & Range (1H)</label>
                         <div class="checkbox-list">
                             <label><input type="checkbox" data-col="bb_upper"> BB Upper</label>
                             <label><input type="checkbox" data-col="bb_lower"> BB Lower</label>
                             <label><input type="checkbox" data-col="bb_range"> BB Range</label>
-                            <label><input type="checkbox" data-col="bb_upper_slope"> BB Upper Slope</label>
-                            <label><input type="checkbox" data-col="bb_lower_slope"> BB Lower Slope</label>
                             <label><input type="checkbox" data-col="bb_width"> BB Width</label>
                             <label><input type="checkbox" data-col="bb_squeeze"> BB Squeeze</label>
                             <label><input type="checkbox" data-col="bb_position"> BB Position</label>
                             <label><input type="checkbox" data-col="atr_14"> ATR(14)</label>
-                            <label><input type="checkbox" data-col="vwap"> VWAP</label>
-                            <label><input type="checkbox" data-col="close_pct_vwap"> Close % VWAP</label>
+                            <label><input type="checkbox" data-col="hl_range"> H-L Range</label>
+                            <label><input type="checkbox" data-col="range_pct"> Range %</label>
+                        </div>
+                    </div>
+                    <div class="indicator-group" id="group-struct" data-timeframe="1h">
+                        <label>Structure Breaks (1H)</label>
+                        <div class="checkbox-list">
+                            <label><input type="checkbox" data-col="break_high_5"> Break 5-Bar High</label>
+                            <label><input type="checkbox" data-col="break_low_5"> Break 5-Bar Low</label>
                         </div>
                     </div>
                     <div class="indicator-group" id="group-daily" data-timeframe="1d">
@@ -130,7 +143,6 @@
                             <div class="col">High</div>
                             <div class="col">Low</div>
                             <div class="col">Close</div>
-                            <div class="col">Volume</div>
                             <div class="col">Signal</div>
                         </div>
                         <div id="data-list" class="data-list">

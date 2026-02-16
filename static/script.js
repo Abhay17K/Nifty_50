@@ -138,7 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
             { id: 'high', label: 'High' },
             { id: 'low', label: 'Low' },
             { id: 'close', label: 'Close' },
-            { id: 'volume', label: 'Volume' },
             { id: 'target', label: 'Signal' }
         ];
 
@@ -149,7 +148,8 @@ document.addEventListener('DOMContentLoaded', () => {
             activeCols.push({ id: colId, label: label });
         });
 
-        const gridTemplate = `180px 100px 100px 100px 100px 100px 120px ${Array(selectedIndicators.length).fill('120px').join(' ')}`;
+        // Adjusted grid template for removed volume (6 base columns + selected indicators)
+        const gridTemplate = `180px 100px 100px 100px 100px 120px ${Array(selectedIndicators.length).fill('120px').join(' ')}`;
         tableHeader.style.gridTemplateColumns = gridTemplate;
         tableHeader.innerHTML = activeCols.map(c => `<div class="col ${c.class || ''}">${c.label}</div>`).join('');
 
@@ -170,7 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
             rowHtml += `<div class="col">${fmt(row.high)}</div>`;
             rowHtml += `<div class="col">${fmt(row.low)}</div>`;
             rowHtml += `<div class="col ${priceClass}">${fmt(row.close)}</div>`;
-            rowHtml += `<div class="col">${row.volume.toLocaleString()}</div>`;
             rowHtml += `<div class="col"><span class="signal ${signalClass}">${target}</span></div>`;
 
             selectedIndicators.forEach(colId => {
@@ -187,9 +186,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function downloadCSV() {
         if (!lastFetchedData.length) return;
 
-        let csv = 'timestamp,open,high,low,close,volume,signal,' + selectedIndicators.join(',') + '\n';
+        let csv = 'timestamp,open,high,low,close,signal,' + selectedIndicators.join(',') + '\n';
         lastFetchedData.forEach(row => {
-            let line = `${row.timestamp},${row.open},${row.high},${row.low},${row.close},${row.volume},${row.target || ''}`;
+            let line = `${row.timestamp},${row.open},${row.high},${row.low},${row.close},${row.target || ''}`;
             selectedIndicators.forEach(colId => {
                 line += `,${row[colId] || ''}`;
             });
