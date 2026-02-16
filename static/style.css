@@ -147,24 +147,114 @@ header {
     overflow: hidden;
 }
 
-.date-filter .date-inputs {
+/* Single Row Control Header */
+.controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 32px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.controls::-webkit-scrollbar {
+    display: none;
+}
+
+.control-group {
     display: flex;
     align-items: center;
     gap: 12px;
-    background: var(--bg-card);
+    flex-shrink: 0;
+}
+
+.control-group label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.timeframe-selector {
+    display: flex;
+    gap: 6px;
+}
+
+.tf-btn {
+    background: var(--bg-hover);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 2px 12px;
+    color: var(--text-secondary);
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.tf-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.control-actions {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.action-btn:hover {
+    background: var(--accent-hover);
+}
+
+.action-btn.secondary {
+    background: var(--bg-hover);
+    border: 1px solid var(--border);
+}
+
+.date-inputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-hover);
+    padding: 0 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
 }
 
 .date-input {
     background: transparent;
     border: none;
     color: var(--text-primary);
-    font-family: inherit;
     font-size: 13px;
+    padding: 6px 0;
     outline: none;
-    padding: 8px 0;
 }
 
 .date-input::-webkit-calendar-picker-indicator {
@@ -220,6 +310,10 @@ header {
     transition: background 0.1s;
 }
 
+.data-row:hover {
+    background: var(--bg-hover);
+}
+
 .sticky {
     position: sticky;
     left: 0;
@@ -253,10 +347,6 @@ header {
 .signal-sideways {
     background: rgba(255, 255, 255, 0.1);
     color: #9ca3af;
-}
-
-.data-row:hover {
-    background: var(--bg-hover);
 }
 
 .price-up {
