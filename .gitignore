@@ -1,0 +1,11 @@
+__pycache__/
+*.db
+*.csv
+.gemini/
+.env
+venv/
+.vscode/
+brain/
+implementation_plan.md
+task.md
+walkthrough.md

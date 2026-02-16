@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nifty 50 Data Viewer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <h1>Nifty 50 <span>Analytics</span></h1>
+            </div>
+            <div class="status-panel">
+                <div class="status-item">
+                    <span class="label">Market Status:</span>
+                    <span id="market-status" class="value status-closed">Closed</span>
+                </div>
+                <div class="status-item">
+                    <span class="label">Last Update:</span>
+                    <span id="last-update" class="value">-</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-layout">
+            <aside class="sidebar">
+                <h3>Indicators</h3>
+                <div class="indicator-sections">
+                    <div class="indicator-group" id="group-rsi" data-timeframe="1h">
+                        <label>RSI Suite (1H)</label>
+                        <div class="checkbox-list">
+                            <label><input type="checkbox" data-col="rsi_14"> RSI(14)</label>
+                            <label><input type="checkbox" data-col="rsi_sma_14"> SMA(RSI)</label>
+                            <label><input type="checkbox" data-col="rsi_diff"> RSI - SMA</label>
+                            <label><input type="checkbox" data-col="rsi_slope"> RSI Slope</label>
+                            <label><input type="checkbox" data-col="rsi_dist_50"> RSI from 50</label>
+                            <label><input type="checkbox" data-col="rsi_zone"> RSI Zone</label>
+                        </div>
+                    </div>
+                    <div class="indicator-group" id="group-ma" data-timeframe="1h">
+                        <label>Moving Averages (1H)</label>
+                        <div class="checkbox-list">
+                            <label><input type="checkbox" data-col="ema_7"> EMA 7</label>
+                            <label><input type="checkbox" data-col="ema_9"> EMA 9</label>
+                            <label><input type="checkbox" data-col="ema_20"> EMA 20</label>
+                            <label><input type="checkbox" data-col="ema_50"> EMA 50</label>
+                            <label><input type="checkbox" data-col="ema_100"> EMA 100</label>
+                            <label><input type="checkbox" data-col="sma_25"> SMA 25</label>
+                            <label><input type="checkbox" data-col="lsma_25"> LSMA 25</label>
+                            <label><input type="checkbox" data-col="lsma_diff"> Close - LSMA25</label>
+                            <label><input type="checkbox" data-col="close_pct_lsma"> Close % LSMA25</label>
+                            <label><input type="checkbox" data-col="close_pct_sma_25"> Close % SMA25</label>
+                            <label><input type="checkbox" data-col="ema_alignment"> EMA Alignment</label>
+                        </div>
+                    </div>
+                    <div class="indicator-group" id="group-vol" data-timeframe="1h">
+                        <label>Volatility & VWAP (1H)</label>
+                        <div class="checkbox-list">
+                            <label><input type="checkbox" data-col="bb_upper"> BB Upper</label>
+                            <label><input type="checkbox" data-col="bb_lower"> BB Lower</label>
+                            <label><input type="checkbox" data-col="bb_range"> BB Range</label>
+                            <label><input type="checkbox" data-col="bb_upper_slope"> BB Upper Slope</label>
+                            <label><input type="checkbox" data-col="bb_lower_slope"> BB Lower Slope</label>
+                            <label><input type="checkbox" data-col="bb_width"> BB Width</label>
+                            <label><input type="checkbox" data-col="bb_squeeze"> BB Squeeze</label>
+                            <label><input type="checkbox" data-col="bb_position"> BB Position</label>
+                            <label><input type="checkbox" data-col="atr_14"> ATR(14)</label>
+                            <label><input type="checkbox" data-col="vwap"> VWAP</label>
+                            <label><input type="checkbox" data-col="close_pct_vwap"> Close % VWAP</label>
+                        </div>
+                    </div>
+                    <div class="indicator-group" id="group-daily" data-timeframe="1d">
+                        <label>Daily Indicators (1D)</label>
+                        <div class="checkbox-list">
+                            <label><input type="checkbox" data-col="rsi_14"> Daily RSI</label>
+                            <label><input type="checkbox" data-col="rsi_slope"> Daily RSI Slope</label>
+                            <label><input type="checkbox" data-col="ema_20"> Daily EMA20</label>
+                            <label><input type="checkbox" data-col="ema_20_slope"> EMA20 Slope</label>
+                            <label><input type="checkbox" data-col="trend_flag"> Trend Flag</label>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="content">
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Timeframe</label>
+                        <div class="timeframe-selector">
+                            <button class="tf-btn" data-tf="15m">15 Min</button>
+                            <button class="tf-btn" data-tf="1h">1 Hour</button>
+                            <button class="tf-btn active" data-tf="1d">1 Day</button>
+                            <button class="tf-btn" data-tf="1wk">1 Week</button>
+                        </div>
+                    </div>
+
+                    <div class="control-group date-filter">
+                        <label>Date Range</label>
+                        <div class="date-inputs">
+                            <input type="date" id="start-date" class="date-input">
+                            <span class="divider">to</span>
+                            <input type="date" id="end-date" class="date-input">
+                        </div>
+                    </div>
+
+                    <div class="control-actions">
+                        <button id="refresh-btn" class="action-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M23 4v6h-6"></path>
+                                <path d="M1 20v-6h6"></path>
+                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                            </svg>
+                            Refresh
+                        </button>
+                        <button id="download-btn" class="action-btn secondary">CSV</button>
+                    </div>
+                </div>
+
+                <div class="data-wrapper">
+                    <div class="data-container" id="dynamic-table">
+                        <div class="table-header" id="table-header">
+                            <div class="col sticky">Time (IST)</div>
+                            <div class="col">Open</div>
+                            <div class="col">High</div>
+                            <div class="col">Low</div>
+                            <div class="col">Close</div>
+                            <div class="col">Volume</div>
+                            <div class="col">Signal</div>
+                        </div>
+                        <div id="data-list" class="data-list">
+                            <div class="loading-state">Loading data...</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,293 @@
+:root {
+    --bg-dark: #0f1115;
+    --bg-card: #181b21;
+    --bg-hover: #22262e;
+    --text-primary: #ffffff;
+    --text-secondary: #9ca3af;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --success: #10b981;
+    --danger: #ef4444;
+    --border: #2d3748;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    line-height: 1.5;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.logo h1 {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.logo span {
+    color: var(--accent);
+}
+
+.status-panel {
+    display: flex;
+    gap: 20px;
+}
+
+.status-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.status-item .label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.status-item .value {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.status-open {
+    color: var(--success);
+}
+
+.status-closed {
+    color: var(--text-secondary);
+}
+
+/* Dashboard Layout */
+.dashboard-layout {
+    display: flex;
+    gap: 24px;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    width: 240px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+}
+
+.sidebar h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.indicator-group label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+}
+
+.checkbox-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.checkbox-list label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-primary);
+    text-transform: none;
+    letter-spacing: normal;
+    cursor: pointer;
+    font-weight: 400;
+}
+
+.checkbox-list input {
+    accent-color: var(--accent);
+}
+
+/* Content Area */
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.date-filter .date-inputs {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2px 12px;
+}
+
+.date-input {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    padding: 8px 0;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+.divider {
+    color: var(--text-secondary);
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+/* Data Wrapper for Horizontal Scroll */
+.data-wrapper {
+    flex: 1;
+    overflow-x: auto;
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.data-container {
+    min-width: 100%;
+    width: max-content;
+    display: flex;
+    flex-direction: column;
+}
+
+.table-header {
+    display: grid;
+    /* Grid template will be set dynamically via JS */
+    padding: 16px 24px;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.data-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.data-row {
+    display: grid;
+    /* Grid template will be set dynamically via JS */
+    padding: 14px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 14px;
+    transition: background 0.1s;
+}
+
+.sticky {
+    position: sticky;
+    left: 0;
+    background: inherit;
+    z-index: 2;
+}
+
+.col {
+    padding: 0 12px;
+    white-space: nowrap;
+}
+
+.signal {
+    font-weight: 700;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.signal-call {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.signal-put {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.signal-sideways {
+    background: rgba(255, 255, 255, 0.1);
+    color: #9ca3af;
+}
+
+.data-row:hover {
+    background: var(--bg-hover);
+}
+
+.price-up {
+    color: var(--success);
+}
+
+.price-down {
+    color: var(--danger);
+}
+
+.loading-state {
+    padding: 40px;
+    text-align: center;
+    color: var(--text-secondary);
+    width: 100%;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-card);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
