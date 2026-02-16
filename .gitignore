@@ -1,6 +1,6 @@
 __pycache__/
-*.db
-*.csv
+# *.db (Removed to allow pushing database as requested)
+# *.csv (Removed as well to provide full data set)
 .gemini/
 .env
 venv/
