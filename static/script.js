@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const dataList = document.getElementById('data-list');
-    const tfBtns = document.querySelectorAll('.tf-btn');
+    const tfSelect = document.getElementById('tf-select');
     const refreshBtn = document.getElementById('refresh-btn');
     const downloadBtn = document.getElementById('download-btn');
     const marketStatusEl = document.getElementById('market-status');
@@ -11,10 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const startDateInput = document.getElementById('start-date');
     const endDateInput = document.getElementById('end-date');
 
-    let currentTimeframe = '1d';
+    let currentTimeframe = 'features_merged';
     let updateInterval;
     let selectedIndicators = [];
     let lastFetchedData = [];
+    let activeCols = [];
 
     // Initialize
     fetchStatus();
@@ -24,30 +25,30 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(fetchStatus, 60000);
 
     // Event Listeners
-    tfBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            tfBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentTimeframe = btn.dataset.tf;
+    tfSelect.addEventListener('change', (e) => {
+        currentTimeframe = e.target.value;
 
-            // Filter Sidebar Indicators
-            updateSidebarFilters(currentTimeframe);
+        // Filter Sidebar Indicators
+        updateSidebarFilters(currentTimeframe);
 
-            // Clear current selections when switching timeframes to avoid column mismatch
-            indicatorCheckboxes.forEach(cb => cb.checked = false);
-            selectedIndicators = [];
+        // Clear current selections when switching timeframes to avoid column mismatch
+        indicatorCheckboxes.forEach(cb => cb.checked = false);
+        selectedIndicators = [];
 
-            loadData(currentTimeframe);
-        });
+        loadData(currentTimeframe);
     });
 
     function updateSidebarFilters(timeframe) {
         const groups = document.querySelectorAll('.indicator-group');
         groups.forEach(group => {
             const groupTf = group.dataset.timeframe;
-            // Show if it's universal (no timeframe) or matches EXACTLY
-            // For now, hourly stuff is on '1h', daily on '1d'
-            if (!groupTf || groupTf === timeframe) {
+            // Features table uses the same indicators as 1h
+            const isML = timeframe === 'features_merged';
+            const showGroup = !groupTf ||
+                groupTf === timeframe ||
+                (isML && groupTf === '1h');
+
+            if (showGroup) {
                 group.style.display = 'block';
             } else {
                 group.style.display = 'none';
@@ -132,24 +133,44 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const baseCols = [
-            { id: 'timestamp', label: 'Time (IST)', class: 'sticky' },
-            { id: 'open', label: 'Open' },
-            { id: 'high', label: 'High' },
-            { id: 'low', label: 'Low' },
-            { id: 'close', label: 'Close' },
+        let baseCols = [
+            { id: 'date', label: 'Date', class: 'sticky' },
+            { id: 'time', label: 'Time', class: 'sticky' },
             { id: 'target', label: 'Signal' }
         ];
 
-        const activeCols = [...baseCols];
+        // If not ML view, add OHLC back
+        if (currentTimeframe !== 'features_merged') {
+            baseCols.splice(2, 0,
+                { id: 'open', label: 'Open' },
+                { id: 'high', label: 'High' },
+                { id: 'low', label: 'Low' },
+                { id: 'close', label: 'Close' }
+            );
+        }
+
+        activeCols = [...baseCols];
         selectedIndicators.forEach(colId => {
             const checkbox = Array.from(indicatorCheckboxes).find(i => i.dataset.col === colId);
             const label = checkbox ? checkbox.parentElement.textContent.trim() : colId;
             activeCols.push({ id: colId, label: label });
         });
 
-        // Adjusted grid template for removed volume (6 base columns + selected indicators)
-        const gridTemplate = `180px 100px 100px 100px 100px 120px ${Array(selectedIndicators.length).fill('120px').join(' ')}`;
+        let processedData = data;
+
+        // Adjusted grid template for split date/time and ML refinements
+        const baseColWidths = activeCols.filter(c => c.class === 'sticky').length === 2 ? '110px 100px ' : '180px '; // fallback
+        // Calculate based on activeCols count
+        const stickyCount = activeCols.filter(c => c.class === 'sticky').length;
+        const otherCount = activeCols.length - stickyCount;
+
+        let gridTemplate = '';
+        if (stickyCount === 2) {
+            gridTemplate = `110px 100px ${Array(otherCount).fill('110px').join(' ')}`;
+        } else {
+            gridTemplate = `110px 100px ${Array(otherCount).fill('110px').join(' ')}`;
+        }
+
         tableHeader.style.gridTemplateColumns = gridTemplate;
         tableHeader.innerHTML = activeCols.map(c => `<div class="col ${c.class || ''}">${c.label}</div>`).join('');
 
@@ -159,21 +180,25 @@ document.addEventListener('DOMContentLoaded', () => {
             return val;
         };
 
-        const html = data.map(row => {
-            const priceClass = row.close >= row.open ? 'price-up' : 'price-down';
+        const html = processedData.map(row => {
+            const priceClass = (row.close && row.open) ? (row.close >= row.open ? 'price-up' : 'price-down') : '';
             const target = row.target || '-';
             const signalClass = target === 'CALL' ? 'signal-call' : (target === 'PUT' ? 'signal-put' : 'signal-sideways');
 
             let rowHtml = `<div class="data-row" style="grid-template-columns: ${gridTemplate}">`;
-            rowHtml += `<div class="col sticky">${row.timestamp}</div>`;
-            rowHtml += `<div class="col">${fmt(row.open)}</div>`;
-            rowHtml += `<div class="col">${fmt(row.high)}</div>`;
-            rowHtml += `<div class="col">${fmt(row.low)}</div>`;
-            rowHtml += `<div class="col ${priceClass}">${fmt(row.close)}</div>`;
-            rowHtml += `<div class="col"><span class="signal ${signalClass}">${target}</span></div>`;
 
-            selectedIndicators.forEach(colId => {
-                rowHtml += `<div class="col">${fmt(row[colId])}</div>`;
+            activeCols.forEach(col => {
+                if (col.id === 'date') {
+                    rowHtml += `<div class="col sticky">${row.date || row.timestamp.split(' ')[0]}</div>`;
+                } else if (col.id === 'time') {
+                    rowHtml += `<div class="col sticky">${row.time || (row.timestamp.includes(' ') ? row.timestamp.split(' ')[1] : '00:00:00')}</div>`;
+                } else if (col.id === 'target') {
+                    rowHtml += `<div class="col"><span class="signal ${signalClass}">${target}</span></div>`;
+                } else if (col.id === 'close') {
+                    rowHtml += `<div class="col ${priceClass}">${fmt(row.close)}</div>`;
+                } else {
+                    rowHtml += `<div class="col">${fmt(row[col.id])}</div>`;
+                }
             });
 
             rowHtml += `</div>`;
@@ -186,13 +211,20 @@ document.addEventListener('DOMContentLoaded', () => {
     function downloadCSV() {
         if (!lastFetchedData.length) return;
 
-        let csv = 'timestamp,open,high,low,close,signal,' + selectedIndicators.join(',') + '\n';
-        lastFetchedData.forEach(row => {
-            let line = `${row.timestamp},${row.open},${row.high},${row.low},${row.close},${row.target || ''}`;
-            selectedIndicators.forEach(colId => {
-                line += `,${row[colId] || ''}`;
+        const csvCols = activeCols.map(c => c.id);
+        let csv = activeCols.map(c => c.label.toLowerCase().replace(/ /g, '_')).join(',') + '\n';
+
+        // Filter out null rows for CSV ONLY if not already filtered by backend
+        // (Wait, backend already filters features_merged, but for other timeframes we show all)
+        let rowsToExport = lastFetchedData;
+
+        rowsToExport.forEach(row => {
+            const vals = activeCols.map(col => {
+                if (col.id === 'date') return row.date || row.timestamp.split(' ')[0];
+                if (col.id === 'time') return row.time || (row.timestamp.includes(' ') ? row.timestamp.split(' ')[1] : '00:00:00');
+                return row[col.id] || '';
             });
-            csv += line + '\n';
+            csv += vals.join(',') + '\n';
         });
 
         const blob = new Blob([csv], { type: 'text/csv' });
